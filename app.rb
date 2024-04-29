@@ -28,7 +28,7 @@ if parsed_gmaps_response["results"].length > 0
   location_longitude = parsed_gmaps_response["results"][0]["geometry"]["location"]["lng"]
 
   #Get the weather at the user’s coordinates from the Pirate Weather API.
-  pirate_weather_url = "https://api.pirateweather.net/forecast/" + pirate_weather_key + "/#{location_latitude},#{location_longitude}"
+  pirate_weather_url = "https://api.pirateweather.net/forecast/#{pirate_weather_key}/#{location_latitude},#{location_longitude}"
 
   parsed_response = JSON.parse(HTTP.get(pirate_weather_url))
 
