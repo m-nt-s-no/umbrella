@@ -14,24 +14,37 @@ pirate_weather_key = ENV.fetch("PIRATE_WEATHER_KEY")
 #Ask the user for their location. (Recall gets.)
 #Get and store the user’s location.
 
-puts "Where are you?"
+puts "Please enter your location to check the weather report."
 location = gets.chomp
 
 #Get the user’s latitude and longitude from the Google Maps API.
+gmaps_url = "https://maps.googleapis.com/maps/api/geocode/json?address=#{location}&key=#{gmaps_key}"
+parsed_gmaps_response = JSON.parse(HTTP.get(gmaps_url))
 
+#added if-else logic to filter out locations not in Gmaps
+if parsed_gmaps_response["results"].length > 0
 
-#Get the weather at the user’s coordinates from the Pirate Weather API.
-pirate_weather_url = "https://api.pirateweather.net/forecast/" + pirate_weather_key + "/41.8887,-87.6355"
+  location_latitude =  parsed_gmaps_response["results"][0]["geometry"]["location"]["lat"]
+  location_longitude = parsed_gmaps_response["results"][0]["geometry"]["location"]["lng"]
 
-parsed_response = JSON.parse(HTTP.get(pirate_weather_url))
+  #Get the weather at the user’s coordinates from the Pirate Weather API.
+  pirate_weather_url = "https://api.pirateweather.net/forecast/" + pirate_weather_key + "/#{location_latitude},#{location_longitude}"
 
-currently_hash = parsed_response.fetch("currently")
+  parsed_response = JSON.parse(HTTP.get(pirate_weather_url))
 
-current_temp = currently_hash.fetch("temperature")
+  currently_hash = parsed_response.fetch("currently")
+  current_temp = currently_hash.fetch("temperature")
+  current_summary = currently_hash.fetch("summary")
 
-#Display the current temperature and summary of the weather for the next hour.
-puts "The current temperature at #{location } is #{current_temp.to_s} Fahrenheit."
+  #Display the current temperature and summary of the weather for the next hour.
+  puts "\n"
+  puts "Weather report for #{location}" 
+  puts "temperature: #{current_temp.to_s} degrees Fahrenheit"
+  puts "current conditions: #{current_summary.downcase}"
 
+else
+  puts "Sorry, we couldn't find #{location}."
+end
 
 #If you get that far, then stretch further:
 #For each of the next twelve hours, check if the precipitation probability is greater than 10%.
