@@ -48,6 +48,31 @@ end
 
 #If you get that far, then stretch further:
 #For each of the next twelve hours, check if the precipitation probability is greater than 10%.
+hourly_report =   parsed_response.fetch("hourly")
+next_twelve_hours = {}
+counter = 1
+while counter < 13 do
+  precip_probability = hourly_report["data"].at(counter)["precipProbability"]
+  if precip_probability > 0.1
+    next_twelve_hours[counter] = hourly_report["data"].at(counter)["precipProbability"]
+  end
+  counter = counter + 1
+end
+
 #If so, print a message saying how many hours from now and what the precipitation probability is.
 #If any of the next twelve hours has a precipitation probability greater than 10%, print “You might want to carry an umbrella!”
-#If not, print “You probably won’t need an umbrella today.”
+if next_twelve_hours.length > 0
+  next_twelve_hours.each do |entry|
+    hour, percent = entry
+    if hour == 1
+      hour_or_hours = "hour"
+    else
+      hour_or_hours = "hours"
+    end
+    puts "#{hour} #{hour_or_hours} from now the percent chance of rain is #{percent * 100} percent"
+  end
+  puts "You might want to carry an umbrella!"
+else
+  #If not, print “You probably won’t need an umbrella today.”
+  puts "You probably won’t need an umbrella today."
+end
